@@ -9,14 +9,6 @@ import Sidebar from './components/Sidebar';
 
 interface Props { }
 
-// interface Product {
-//   id: string;
-//   catid: number;
-//   date: string;
-//   fabid: number;
-//   prodid: number;
-// }
-
 interface ChartData {
   [year: string]: number[];
 }
@@ -26,7 +18,7 @@ const App: React.FC<Props> = (props) => {
   // const [data, setData] = useState<any>([]);
   // const [products, setProducts] = useState<Product[]>([]);
   const [chartData, setChartData] = useState<ChartData>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [chartOptions, setChartOptions] = useState<any>();
 
   // Options initiales pour le graphique ApexCharts
   const initialChartOptions = {
@@ -49,8 +41,6 @@ const App: React.FC<Props> = (props) => {
       data: number[][];
     }[];
   }
-
-  const [chartOptions, setChartOptions] = useState<any>();
 
   const fetchData = async () => {
     //----------------------------------------------GET URL------------------------------------------------------//
@@ -154,14 +144,6 @@ const App: React.FC<Props> = (props) => {
       // Mettez à jour les états locaux avec les données (STYLE INITIAL)
       setChartOptions(datard.options)
       setChartSeries(datard.series)
-
-      // Mettez à jour les états locaux avec les données (SECOND STYLE)
-      setChartData({
-        '2022': seriesMonths22,
-        '2023': seriesMonths23,
-      });
-
-      setIsLoading(false);
       // ------------------------------------------------------------------------------------------------------//
       //
       //
@@ -170,32 +152,22 @@ const App: React.FC<Props> = (props) => {
       const years = ["2022", "2023"]
 
       const seriesYears22 = years.map(
-        (val, i) =>
-          `01-${(i + 1).toLocaleString('en-US', {
-            minimumIntegerDigits: 2,
-            useGrouping: false,
-          })}-2022`
-      ).map(val => result[0]["2022"][val] ?? 0)
+        val => result[1]["2022"][val] ?? 0)
       console.log(seriesYears22)
 
       const seriesYears23 = years.map(
-        (val, i) => `01-${(i + 1).toLocaleString('en-US', {
-          minimumIntegerDigits: 2,
-          useGrouping: false,
-        })}-2023`
-      ).map(val => result[1]["2023"][val] ?? 0)
+        val => result[2]["2023"][val] ?? 0)
       console.log(seriesYears23)
 
 
       const datard2 = {
-        series: [
-          {
-            name: '2022',
-            data: seriesYears22
-          }, {
-            name: '2023',
-            data: seriesYears23
-          }],
+        series: [{
+          name: '2022',
+          data: seriesYears22
+        }, {
+          name: '2023',
+          data: seriesYears23
+        }],
         options: {
           chart: {
             height: 350,
@@ -221,7 +193,7 @@ const App: React.FC<Props> = (props) => {
           //   }
           // },
           xaxis: {
-            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            categories: ["2022", "2023"],
             position: 'top',
             axisBorder: {
               show: false
@@ -256,9 +228,9 @@ const App: React.FC<Props> = (props) => {
           }
         }
       }
-      // Mettez à jour les états locaux avec les données
-      setChartOptions(datard.options)
-      setChartSeries(datard.series)
+      // Mettez à jour les états locaux avec les données (STYLE INITIAL)
+      setChartOptions(datard2.options)
+      setChartSeries(datard2.series)
       // ------------------------------------------------------------------------------------------------------//
       //
       //
@@ -335,8 +307,8 @@ const App: React.FC<Props> = (props) => {
         }
       }
       // Mettez à jour les états locaux avec les données
-      setChartOptions(datard.options)
-      setChartSeries(datard.series)
+      setChartOptions(datard3.options)
+      setChartSeries(datard3.series)
       // ------------------------------------------------------------------------------------------------------//
       //
       //
@@ -413,28 +385,18 @@ const App: React.FC<Props> = (props) => {
         }
       }
       // Mettez à jour les états locaux avec les données
-      setChartOptions(datard.options)
-      setChartSeries(datard.series)
+      setChartOptions(datard4.options)
+      setChartSeries(datard4.series)
       // ------------------------------------------------------------------------------------------------------//
 
     } catch (error) {
       console.error('Erreur lors de la récupération des données :', error);
-      setIsLoading(false);
     }
   }
   useEffect(() => {
     fetchData()
   }, []
   );
-
-
-  // Structurez les données pour ApexCharts
-  // const series = Object.keys(chartData).map((year) => {
-  //   return {
-  //     name: year,
-  //     data: Object.keys(chartData[year]).map((month) => [new Date(month).getTime(), chartData[year][month]]),
-  //   };
-  // });
 
   const [chartSeries, setChartSeries] = useState<any>([]);
 
@@ -480,20 +442,22 @@ const App: React.FC<Props> = (props) => {
             )} */}
           </div>
 
+          {/* -------------------------ApexChart Get Data Graphique 1------------------------- */}
 
-          {/* Graphique ApexCharts */}
-          <h2>Données du magasin</h2>
-          {isLoading ? (
-            <div>Chargement en cours...</div>
-          ) : Object.keys(chartData).length > 0 ? (
-            <ApexCharts
-              options={{
-                chart: {
-                  height: 350,
-                  type: 'bar',
-                },
-                // Autres options du graphique
-              }}
+          <h2>Vente du fabriquant {1}</h2>
+          {chartOptions && chartSeries && <ApexCharts
+            options={chartOptions}
+            series={chartSeries}
+            type="area"
+            height={350}
+          />}
+          {/* ------------------------------------------------------------------------------- */}
+
+          {/* -------------------------ApexChart Get Data Graphique 2------------------------- */}
+          <div>
+            <h2>Vente par mois de l'article {2}</h2>
+            {chartOptions && chartSeries && <ApexCharts
+              options={chartOptions}
               series={[
                 {
                   name: '2022',
@@ -504,50 +468,33 @@ const App: React.FC<Props> = (props) => {
                   data: chartData['2023'],
                 },
               ]}
-              type="bar"
+              type="area"
               height={350}
-            />
-          ) : (
-            <div>Aucune donnée disponible.</div>
-          )}
-          {/* -------------------------ApexChart Get Data------------------------- */}
+            />}
+            {/* ------------------------------------------------------------------------------- */}
 
-          <h2>Données du magasin</h2>
-          {chartOptions && chartSeries && <ApexCharts
-            options={chartOptions}
-            series={chartSeries}
-            type="area"
-            height={350}
-          />}
-          {/* --------------------------------------------------------------------------- */}
-
-          {/* -------------------------ApexChart Graphique------------------------- */}
-          <div>
-            <h2>Total Data</h2>
+            {/* -------------------------ApexChart Get Data Graphique 3------------------------- */}
+            <h2>Top 10 des ventes magasins</h2>
             {chartOptions && chartSeries && <ApexCharts
               options={chartOptions}
               series={chartSeries}
               type="area"
               height={350}
             />}
+            {/* ------------------------------------------------------------------------------- */}
 
-            <h2>Magasin Data</h2>
+            {/* -------------------------ApexChart Get Data Graphique 4------------------------- */}
+            <h2>Vente du xxx {4}</h2>
             {chartOptions && chartSeries && <ApexCharts
               options={chartOptions}
               series={chartSeries}
               type="area"
               height={350}
             />}
+            {/* ------------------------------------------------------------------------------- */}
 
-            <h2>Fabricant Magasin Data</h2>
-            {chartOptions && chartSeries && <ApexCharts
-              options={chartOptions}
-              series={chartSeries}
-              type="area"
-              height={350}
-            />}
           </div>
-          {/* --------------------------------------------------------------------------- */}
+          {/* ------------------------------------------------------------------------------- */}
 
         </main>
       </div>
