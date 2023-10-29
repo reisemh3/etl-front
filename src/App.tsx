@@ -6,6 +6,8 @@ import ApexCharts from 'react-apexcharts';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Sidebar from './components/Sidebar';
+import ChartBar from './components/chartBar';
+import ChartArea from './components/chartArea';
 
 interface Props { }
 
@@ -19,6 +21,7 @@ const App: React.FC<Props> = (props) => {
   // const [products, setProducts] = useState<Product[]>([]);
   const [chartData, setChartData] = useState<ChartData>({});
   const [chartOptions, setChartOptions] = useState<any>();
+  const [chartResult, setChartResult] = useState<any>([]);
 
   // Options initiales pour le graphique ApexCharts
   const initialChartOptions = {
@@ -46,15 +49,17 @@ const App: React.FC<Props> = (props) => {
     //----------------------------------------------GET URL------------------------------------------------------//
     try {
       const url =
-        'http://127.0.0.1:8080/pointvente/health/fab/109/cat/1/date/2022-05-01/2022-05-31'
+        'http://127.0.0.1:8080/pointvente/health/fab/109/cat/1/date/2022-05-02/2022-05-31'
 
       const result = await fetch(url).then(response => response.json())
       console.log(result)
+      setChartResult(result)
       //
       //
       //
       // ------------------------------------------------SET DATA 1------------------------------------------------//
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      console.log(months)
 
       const seriesMonths22 = months.map(
         (val, i) =>
@@ -484,15 +489,11 @@ const App: React.FC<Props> = (props) => {
             {/* ------------------------------------------------------------------------------- */}
 
             {/* -------------------------ApexChart Get Data Graphique 4------------------------- */}
-            <h2>Vente du xxx {4}</h2>
-            {chartOptions && chartSeries && <ApexCharts
-              options={chartOptions}
-              series={chartSeries}
-              type="area"
-              height={350}
-            />}
+              <h2>Parts des ventes par mois</h2>
+              <ChartArea result={chartResult}/>
             {/* ------------------------------------------------------------------------------- */}
-
+              <h2>Blep</h2>
+              <ChartBar result={chartResult} />
           </div>
           {/* ------------------------------------------------------------------------------- */}
 
